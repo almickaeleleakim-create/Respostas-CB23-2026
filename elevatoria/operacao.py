@@ -17,6 +17,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 from typing import Sequence
+import numpy as np
 
 from elevatoria.calibracao import CurvaCalibracao
 from elevatoria.raizes import MetodoRaiz, ResultadoRaiz
@@ -49,7 +50,20 @@ def ponto_operacao(bomba: CurvaCalibracao, tubulacao: Tubulacao, resolvedor: Met
     `ValueError` do próprio resolvedor (por exemplo, sem troca de sinal na bissecção) não é
     tratado: ele chega a quem chamou `ponto_operacao`.
     """
-    raise NotImplementedError("issue #8: ponto_operacao")
+    if a >= b:
+        raise ValueError(f"O intervalo deve satisfazer a < b, recebi a = {a} e b = {b}")
+    if a < bomba.dominio[0] or b > bomba.dominio[1]:
+        raise ValueError(
+            f"O intervalo [{a}, {b}] deve estar dentro "
+            f"do domínio da bomba [{bomba.dominio[0]}, {bomba.dominio[1]}]"
+        )
+    def f(Q: float) -> float:
+        return bomba(Q) - tubulacao.altura_sistema(Q)
+    resultado = resolvedor.encontrar(f, a, b)
+    if resultado.convergiu:
+        Q = resultado.raiz
+        return PontoOperacao(vazao=Q, altura=bomba(Q), resultado=resultado)
+    raise ValueError("Resultado não convergiu")
 
 
 def ordem_convergencia(historico: Sequence[float], raiz: float, piso: float = 1e-14) -> float:
