@@ -53,3 +53,27 @@ O resultado mais surpreendente é `s.sum()`: embora a soma reduza a série a um 
 ### R7 — Issue #4
 
 Com 600 leituras e janela 30, `media_movel` devolvia 570 valores, mas o contrato exige `600 - 30 + 1 = 571`. O teste de regressão `test_tamanho_com_600_leituras_e_janela_30` verifica esse tamanho; também cobri o caso-limite em `test_janela_igual_ao_tamanho_da_serie`. A versão defeituosa subtraía `acumulada[:-janela]` de `acumulada[janela:]`, deixando de calcular a primeira janela; corrigi os índices para começar em `acumulada[janela-1:]` e acrescentei zero ao início do vetor de somas acumuladas deslocado. Os testes de aceitação só verificavam o tipo de retorno e as janelas inválidas, não o comprimento nem os valores calculados; `test_primeiro_valor_e_a_media_dos_primeiros_pontos` também verifica as médias esperadas, e `test_janela_1_devolve_a_propria_serie` cobre a janela 1.
+
+## Marco 2
+
+### Ambiente
+
+`Python 3.13.15 | NumPy 2.5.4 | SciPy 1.18.1 | fornecido 4.0 | matrícula 3492`
+
+### R8 — Derivada numérica
+
+O erro cai de `1.658e-05` (`h=1`) até `6.224e-10` (`h=1e-5`) porque o erro de truncamento da diferença adiante diminui com `h`.
+Para passos ainda menores, o arredondamento de ponto flutuante e o cancelamento numérico dominam, fazendo o erro crescer.
+Em `h=1e-14`, `1000 + 1e-14 == 1000`; a diferença adiante fica zero e o erro absoluto é `|0 - 0.213432888873|`, igual à derivada exata.
+
+### R9 — Issue #7
+
+Os testes de regressão são `test_um_milhao_de_pulsos` e `test_erro_do_kahan_e_bem_menor_que_o_do_ingenuo`.
+Como `t = s + y`, `t - (s + y)` repete a mesma soma arredondada e subtrai valores iguais, resultando em zero; `(t - s) - y` preserva a informação do arredondamento.
+Os testes de aceitação somavam apenas dez parcelas de `0.1`, caso em que `math.isclose` aceita o resultado; eles não revelavam o erro acumulado em somas longas.
+
+### R10 — Precisão × exatidão
+
+Para PT102, os desvios são quase iguais: `0.541 kPa` (linear) e `0.543 kPa` (spline), indicando dispersão e precisão semelhantes.
+Os vieses diferem: `-1.841 kPa` na curva linear e `-0.011 kPa` na spline; a média spline (`380.0 kPa`) fica muito mais próxima do valor verdadeiro do que a linear (`378.2 kPa`).
+Mesmo com 595 leituras válidas, a média reduz a variação aleatória, mas não elimina o viés sistemático causado pela curva linear.
