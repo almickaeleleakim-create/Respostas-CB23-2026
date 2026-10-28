@@ -22,9 +22,7 @@ class TestBisseccaoExemplo(unittest.TestCase):
 # issue #9 (escreva-os ANTES de corrigir o defeito e confirme que falham).
 class TestNewton(unittest.TestCase):
     def test_newton_recalcula_derivada(self):
-        """Verifica se Newton recalcula a derivada a cada iteração.
-        Para isso utiliza a função x²-2 cujas raízes são ±√2
-        e cuja derivada é 2x"""
+        """Verifica se Newton recalcula a derivada a cada iteração."""
         chamadas = []
         def derivada(x):
             chamadas.append(x)
