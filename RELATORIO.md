@@ -77,3 +77,18 @@ Os testes de aceitação somavam apenas dez parcelas de `0.1`, caso em que `math
 Para PT102, os desvios são quase iguais: `0.541 kPa` (linear) e `0.543 kPa` (spline), indicando dispersão e precisão semelhantes.
 Os vieses diferem: `-1.841 kPa` na curva linear e `-0.011 kPa` na spline; a média spline (`380.0 kPa`) fica muito mais próxima do valor verdadeiro do que a linear (`378.2 kPa`).
 Mesmo com 595 leituras válidas, a média reduz a variação aleatória, mas não elimina o viés sistemático causado pela curva linear.
+
+## Marco 3
+
+### R11 — Bissecção × Newton
+
+A bissecção usa sempre o intervalo `[2, 15]` e tolerância `1e-12` para resolver Colebrook; como reduz a largura pela metade a cada iteração, precisa de 44 iterações, independentemente de `Re`.
+Newton precisou de 5, 4 e 3 iterações para `Re = 10⁴`, `10⁵` e `10⁶`, com ordens estimadas de `2.00`, `1.98` e `2.00`.
+Ordem 2 significa que, perto da raiz, o erro seguinte é aproximadamente proporcional ao quadrado do erro atual, fazendo os dígitos corretos tenderem a dobrar a cada iteração.
+Por exemplo, para `f(x) = x³` em `[-1, 1]`, Newton começa em `x = 0` e falha porque `f′(0) = 0`; a bissecção encontra a raiz `0` imediatamente.
+
+### R12 — Issue #9
+
+Os testes de regressão são `test_newton_recalcula_derivada` e `test_newton_converge_em_poucas_iteracoes`.
+Calcular a derivada apenas no ponto inicial mantém a inclinação fixa nas iterações seguintes; em geral, isso perde a convergência quadrática de Newton e resulta em convergência linear perto da raiz.
+Os testes de aceitação verificavam principalmente a correção da raiz/fator calculado, mas não impunham um limite de iterações nem verificavam a ordem de convergência, então o resultado correto escondia a lentidão.
