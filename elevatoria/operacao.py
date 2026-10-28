@@ -80,4 +80,16 @@ def ordem_convergencia(historico: Sequence[float], raiz: float, piso: float = 1e
 
     Levanta `ValueError` se houver menos de 3 erros acima do piso.
     """
-    raise NotImplementedError("issue #8: ordem_convergencia")
+    k=-1
+    erros_validos=[]
+    while len(erros_validos)<3 and -k<len(historico):
+        e_k = abs(historico[k] - raiz)
+        if e_k > (piso*max(1,abs(raiz))):
+            erros_validos.append(e_k)
+        k-=1
+    if len(erros_validos)!=3:
+        raise ValueError("Não há 3 erros acima do piso")
+    den = math.log(erros_validos[1]/erros_validos[2])
+    if den == 0: #Se log(e_k / e_{k-1}) = 0 vai ter divisão por 0, esse if levanta o erro para especificar o problema que aconteceu
+        raise ValueError("Não é possível estimar a ordem de convergência pois ocorre divisão por 0")
+    return math.log(erros_validos[0]/erros_validos[1])/den
