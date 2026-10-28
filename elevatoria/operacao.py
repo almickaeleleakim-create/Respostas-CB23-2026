@@ -82,7 +82,7 @@ def ordem_convergencia(historico: Sequence[float], raiz: float, piso: float = 1e
     """
     k=-1
     erros_validos=[]
-    while len(erros_validos)<3 and -k<len(historico):
+    while len(erros_validos)<3 and -k<=len(historico):
         e_k = abs(historico[k] - raiz)
         if e_k > (piso*max(1,abs(raiz))):
             erros_validos.append(e_k)
