@@ -41,7 +41,16 @@ def ajustar_polinomio(x: np.ndarray, y: np.ndarray, grau: int) -> np.ndarray:
     Levanta `ValueError` se `x` e `y` não forem vetores 1D do mesmo tamanho, se `grau < 0` ou se
     houver menos pontos que coeficientes (`len(x) < grau + 1`).
     """
-    raise NotImplementedError("issue #10: ajustar_polinomio")
+    x = np.asarray(x, dtype=float)
+    y = np.asarray(y, dtype=float)
+    if x.ndim != 1 or y.ndim != 1 or x.size != y.size:
+        raise ValueError("x e y devem ser vetores 1D do mesmo tamanho")
+    if grau<0:
+        raise ValueError(f"Grau não pode ser negativo, recebi {grau}")
+    if len(x)<grau+1:
+        raise ValueError(f"É preciso no mínimo {grau + 1} pontos para ajustar o polinômio, recebi {len(x)}")
+    coeficientes = np.polyfit(x, y, grau)[::-1]
+    return coeficientes
 
 
 @dataclass(frozen=True)
