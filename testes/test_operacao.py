@@ -6,8 +6,8 @@ ser que a igualdade exata seja justamente o que você quer testar.
 """
 import unittest
 
-from elevatoria.raizes import Bisseccao
-
+from elevatoria.raizes import Bisseccao, Newton
+from fornecido.hidraulica import fator_atrito_colebrook
 
 class TestBisseccaoExemplo(unittest.TestCase):
     """Exemplo do formato. `Bisseccao` é código existente da base."""
@@ -20,7 +20,23 @@ class TestBisseccaoExemplo(unittest.TestCase):
 
 # Acrescente abaixo as suas classes de teste, começando pelos testes de regressão da
 # issue #9 (escreva-os ANTES de corrigir o defeito e confirme que falham).
+class TestNewton(unittest.TestCase):
+    def test_newton_recalcula_derivada(self):
+        """Verifica se Newton recalcula a derivada a cada iteração.
+        Para isso utiliza a função x²-2 cujas raízes são ±√2
+        e cuja derivada é 2x"""
+        chamadas = []
+        def derivada(x):
+            chamadas.append(x)
+            return 2 * x
+        resultado = Newton(df=derivada).encontrar(lambda x: x**2 - 2, 0, 2)
+        self.assertEqual(len(chamadas), resultado.iteracoes)
 
-
+    def test_newton_converge_em_poucas_iteracoes(self):
+        """Verifica se Newton resolve Colebrook em até 6 iterações."""
+        resultado = fator_atrito_colebrook(1e4, 0.15e-3 / 0.20, Newton(tol=1e-12))
+        self.assertTrue(resultado[1].convergiu)
+        self.assertLessEqual(resultado[1].iteracoes, 6)
+        
 if __name__ == "__main__":
     unittest.main()
