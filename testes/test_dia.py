@@ -5,8 +5,10 @@ dizendo qual caso ele cobre, e floats comparados com assertAlmostEqual ou np.all
 ser que a igualdade exata seja justamente o que você quer testar.
 """
 import unittest
+import numpy as np
 
 from elevatoria.integracao import Simpson, Trapezio
+from elevatoria.dia import ajustar_polinomio, dia_de_operacao
 
 
 class TestSimpsonExemplo(unittest.TestCase):
@@ -37,6 +39,19 @@ class TestIntegracaoTrapezio(unittest.TestCase):
         integrador = Trapezio()
         #Usa assertAlmostEqual pra evitar erros de ponto flutuante
         self.assertAlmostEqual(integrador.integrar_tabela(x=valores_x,y=valores_y), 10)
+
+class TestLevantamentoDeErroAjustarPolinomio(unittest.TestCase):
+    def test_x_y_tamanhos_diferentes(self):
+        """ajustar_polinomio levanta erro para len(x)!=len(y)"""
+        with self.assertRaises(ValueError):
+            ajustar_polinomio([1,2,3,4],[4],2)            
+
+class TestLevantamentoDeErroDiaDeOperacao(unittest.TestCase):
+    def test_faixas_faltando(self):
+        """dia_de_operacao levanta erro para algum elemento de (0, 18, 21, 24) faltando em t"""
+        t = np.asarray([0,4,18,19,21])
+        with self.assertRaises(ValueError):
+            dia_de_operacao(t,[1,2,3,4,5],[1,2,3,4,5],[1,2,3,4,5],Trapezio())
 
 if __name__ == "__main__":
     unittest.main()
