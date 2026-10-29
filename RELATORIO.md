@@ -92,3 +92,18 @@ Por exemplo, para `f(x) = x³` em `[-1, 1]`, Newton começa em `x = 0` e falha p
 Os testes de regressão são `test_newton_recalcula_derivada` e `test_newton_converge_em_poucas_iteracoes`.
 Calcular a derivada apenas no ponto inicial mantém a inclinação fixa nas iterações seguintes; em geral, isso perde a convergência quadrática de Newton e resulta em convergência linear perto da raiz.
 Os testes de aceitação verificavam principalmente a correção da raiz/fator calculado, mas não impunham um limite de iterações nem verificavam a ordem de convergência, então o resultado correto escondia a lentidão.
+
+## Marco 4
+
+### R13 — Integração e descontinuidade
+
+Na Etapa 1(b), o custo integrado de uma vez atravessa os saltos da tarifa às 18 h e às 21 h, deixando o integrando descontínuo; por isso a ordem observada cai para 1,00 no trapézio e 0,65 no Simpson.
+Separando a integral por faixa tarifária, cada trecho tem tarifa constante e os saltos ficam nos limites dos trechos. Assim, as ordens voltam a 2,00 para o trapézio e 4,00 para Simpson.
+Para `n = 110`, os erros por faixa foram `6.3e-04` (trapézio) e `8.1e-08` (Simpson).
+
+### R14 — Issue #11
+
+Os testes de regressão são `test_exato_para_afim_com_tabela_irregular` e `test_exato_para_constante_com_tabela_irregular`; ambos verificam integrais conhecidas em malhas irregulares.
+O defeito usava apenas o primeiro passo, `x[1] - x[0]`, para todos os trapézios. A correção usa a largura individual de cada intervalo, `np.diff(x)`, e soma as áreas correspondentes.
+Os testes de aceitação usavam malhas uniformes (`np.linspace` ou intervalos de 1,5 h), nas quais todos os passos são iguais; por isso não revelavam o defeito.
+O registro real tem 89 leituras para 97 esperadas e intervalos de 15, 30 e 45 minutos. Simpson exige pontos igualmente espaçados, então não serve para essa tabela irregular e corretamente levanta `ValueError`.
